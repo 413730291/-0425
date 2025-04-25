@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sketch</title>
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <script src="libraries/p5.min.js"></script>
+    <script src="libraries/p5.sound.min.js"></script>
+
+    <style>
+      /* 選單樣式 */
+      .menu {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 10px;
+        background-color: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 3;
+      }
+
+      .menu li {
+        margin: 0 10px;
+        position: relative;
+      }
+
+      .menu a {
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+        font-family: Arial, sans-serif;
+      }
+
+      .menu a:hover {
+        color: #007BFF;
+      }
+
+      /* 氣泡容器樣式 */
+      #bubble-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex; /* 使用 flexbox 排列 */
+        flex-wrap: wrap; /* 允許換行 */
+        gap: 20px; /* 氣泡之間的間距 */
+        justify-content: center; /* 水平居中 */
+        align-items: center; /* 垂直居中 */
+        z-index: 10;
+      }
+
+      /* 氣泡樣式 */
+      .bubble {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 60px;
+        height: 60px;
+        background: #007BFF;
+        color: #fff;
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+        border-radius: 50%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        animation: bounce 1.5s infinite;
+      }
+
+      /* 為每個氣泡設置不同的動畫延遲 */
+      .bubble:nth-child(1) {
+        animation-delay: 0s;
+      }
+      .bubble:nth-child(2) {
+        animation-delay: 0.1s;
+      }
+      .bubble:nth-child(3) {
+        animation-delay: 0.2s;
+      }
+      .bubble:nth-child(4) {
+        animation-delay: 0.3s;
+      }
+      .bubble:nth-child(5) {
+        animation-delay: 0.4s;
+      }
+      .bubble:nth-child(6) {
+        animation-delay: 0.5s;
+      }
+      .bubble:nth-child(7) {
+        animation-delay: 0.6s;
+      }
+
+      /* 跳動動畫 */
+      @keyframes bounce {
+        0%, 100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* iframe 樣式 */
+      iframe {
+        width: 100%;
+        height: 80vh;
+        border: none;
+        margin-top: 80px;
+        z-index: 2;
+        position: relative;
+        display: none;
+      }
+
+      /* 隱藏子選單 */
+      .submenu.hidden {
+        display: none;
+      }
+
+      /* 顯示子選單 */
+      .submenu {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        background-color: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 5;
+      }
+
+      .submenu li {
+        margin: 0;
+      }
+
+      .submenu a {
+        display: block;
+        padding: 10px;
+        text-decoration: none;
+        color: #333;
+        font-family: Arial, sans-serif;
+      }
+
+      .submenu a:hover {
+        background-color: #f0f0f0;
+        color: #007BFF;
+      }
+
+      #quiz-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        text-align: center;
+        z-index: 10;
+        color: #333;
+      }
+
+      #quiz-container h2 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #fff;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      #quiz-container ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      #quiz-container li {
+        margin: 10px 0;
+      }
+
+      #quiz-container button {
+        padding: 10px 20px;
+        font-size: 16px;
+        color: #fff;
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      #quiz-container button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      /* 結算畫面背景 */
+      #result-screen {
+        background: linear-gradient(135deg, #89f7fe, #66a6ff);
+        color: #fff;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      #result-screen button {
+        background: linear-gradient(135deg, #ff758c, #ff7eb3);
+      }
+
+      /* 顯示題目時的動畫效果 */
+      .fade-in {
+        animation: fadeIn 1s ease-in-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <ul class="menu" id="menu">
+      <li>
+        <a href="#" onclick="hideIframe()">
+          <i class="fas fa-home menu-icon"></i> 首頁
+        </a>
+      </li>
+      <li>
+        <a href="#about" onclick="loadIframe('https://413730291.github.io/introduce/')">
+          <i class="fas fa-user menu-icon"></i> 自我介紹
+        </a>
+      </li>
+      <li>
+        <a href="#portfolio" onclick="toggleSubmenu(event)">
+          <i class="fas fa-briefcase menu-icon"></i> 作品集
+        </a>
+        <ul class="submenu hidden" id="portfolioSubmenu">
+          <li>
+            <a href="#" onclick="loadIframe('https://hackmd.io/@chi10199/HkRcik_ike')">
+              <i class="fas fa-calendar-week submenu-icon"></i> 期中
+            </a>
+          </li>
+          <li>
+            <a href="#" onclick="loadIframe('https://413730291.github.io/0221/')">
+              <i class="fas fa-calendar-week submenu-icon"></i> 第一周
+            </a>
+          </li>
+          <li>
+            <a href="#" onclick="loadIframe('https://413730291.github.io/2/')">
+              <i class="fas fa-calendar-week submenu-icon"></i> 第二周
+            </a>
+          </li>
+          <li>
+            <a href="#" onclick="loadIframe('https://413730291.github.io/3/')">
+              <i class="fas fa-calendar-week submenu-icon"></i> 第三周
+            </a>
+          </li>
+          <li>
+            <a href="#" onclick="loadIframe('https://413730291.github.io/20250328/')">
+              <i class="fas fa-calendar-week submenu-icon"></i> 第四周
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a href="#tutorial" onclick="loadIframe('https://cfchen58.synology.me/程式設計下/週四A班/week4/20230309_154110.mp4')">
+          <i class="fas fa-video menu-icon"></i> 教學影片
+        </a>
+      </li>
+      <li>
+        <a href="#quiz" onclick="loadQuiz()">
+          <i class="fas fa-question-circle menu-icon"></i> 測驗卷
+        </a>
+      </li>
+    </ul>
+
+    <div id="bubble-container">
+      <div class="bubble">程</div>
+      <div class="bubble">式</div>
+      <div class="bubble">設</div>
+      <div class="bubble">計</div>
+      <div class="bubble">與</div>
+      <div class="bubble">實</div>
+      <div class="bubble">習</div>
+    </div>
+
+    <div id="quiz-container" class="hidden">
+      <!-- 第一題 -->
+      <div id="question-1">
+        <h2>第一題：哪一個函數是用來設定畫面大小？</h2>
+        <ul>
+          <li><button onclick="checkAnswer(1, 'background')">選項一：background()</button></li>
+          <li><button onclick="checkAnswer(1, 'createCanvas')">選項二：createCanvas()</button></li>
+          <li><button onclick="checkAnswer(1, 'canvas')">選項三：canvas()</button></li>
+        </ul>
+      </div>
+
+      <!-- 第二題 -->
+      <div id="question-2" class="hidden">
+        <h2>第二題：以下哪一個函數可以用來畫圖？</h2>
+        <ul>
+          <li><button onclick="checkAnswer(2, 'circle')">選項一：circle()</button></li>
+          <li><button onclick="checkAnswer(2, 'rect')">選項二：rect()</button></li>
+          <li><button onclick="checkAnswer(2, 'ellipse')">選項三：ellipse()</button></li>
+        </ul>
+      </div>
+
+      <!-- 第三題 -->
+      <div id="question-3" class="hidden">
+        <h2>第三題：mouseX 和 mouseY 代表什麼意思？</h2>
+        <ul>
+          <li><button onclick="checkAnswer(3, 'speed')">選項一：滑鼠的速度</button></li>
+          <li><button onclick="checkAnswer(3, 'coordinates')">選項二：滑鼠在畫布上的座標</button></li>
+          <li><button onclick="checkAnswer(3, 'dimensions')">選項三：畫布的寬高</button></li>
+        </ul>
+      </div>
+
+      <!-- 結算畫面 -->
+      <div id="result-screen" class="hidden">
+        <h2>測驗結束！</h2>
+        <p id="result-message"></p>
+        <button onclick="restartQuiz()">重新開始</button>
+      </div>
+    </div>
+
+    <!-- iframe 用於嵌入網頁 -->
+    <iframe id="contentFrame" src=""></iframe>
+
+    <!-- sketch.js 畫布 -->
+    <script src="sketch.js"></script>
+
+    <script>
+      // 動態加載 iframe 的內容
+      function loadIframe(url) {
+        hideQuiz(); // 切換到其他選項時隱藏測驗卷內容
+        const iframe = document.getElementById('contentFrame');
+        iframe.src = url; // 設置 iframe 的 src
+        iframe.style.display = 'block'; // 顯示 iframe
+        hideBubble(); // 隱藏首頁內容
+      }
+
+      // 隱藏 iframe 並顯示首頁內容
+      function hideIframe() {
+        hideQuiz(); // 切換到首頁時隱藏測驗卷內容
+        const iframe = document.getElementById('contentFrame');
+        iframe.src = ''; // 清空 iframe 的 src
+        iframe.style.display = 'none'; // 隱藏 iframe
+        showBubble(); // 顯示首頁內容
+      }
+
+      // 顯示首頁內容（氣泡）
+      function showBubble() {
+        const bubble = document.getElementById('bubble-container');
+        bubble.style.display = 'flex'; // 顯示氣泡容器
+      }
+
+      // 隱藏首頁內容（氣泡）
+      function hideBubble() {
+        const bubble = document.getElementById('bubble-container');
+        bubble.style.display = 'none'; // 隱藏氣泡容器
+      }
+
+      // 切換子選單的顯示與隱藏
+      function toggleSubmenu(event) {
+        event.preventDefault(); // 防止預設的跳轉行為
+        const submenu = document.getElementById('portfolioSubmenu');
+        submenu.classList.toggle('hidden'); // 切換 hidden 類別
+      }
+
+      // 顯示測驗題目
+      function loadQuiz() {
+        const quizContainer = document.getElementById('quiz-container');
+        quizContainer.classList.remove('hidden'); // 顯示測驗容器
+        hideBubble(); // 隱藏首頁內容
+        const iframe = document.getElementById('contentFrame');
+        iframe.style.display = 'none'; // 隱藏 iframe
+      }
+
+      // 隱藏測驗題目
+      function hideQuiz() {
+        const quizContainer = document.getElementById('quiz-container');
+        quizContainer.classList.add('hidden'); // 隱藏測驗容器
+      }
+
+      let correctAnswers = 0; // 記錄答對的題數
+
+      // 顯示題目時添加動畫效果
+      function showQuestion(questionId) {
+        const question = document.getElementById(questionId);
+        question.classList.remove('hidden');
+        question.classList.add('fade-in'); // 添加淡入動畫
+      }
+
+      // 檢查答案
+      function checkAnswer(question, answer) {
+        if (question === 1 && answer === 'createCanvas') {
+          alert('第一題答對了！createCanvas() 是用來設定畫面大小的函數。');
+          correctAnswers++;
+          document.getElementById('question-1').classList.add('hidden'); // 隱藏第一題
+          showQuestion('question-2'); // 顯示第二題
+        } else if (question === 2 && answer === 'ellipse') {
+          alert('第二題答對了！ellipse() 是用來畫圖的函數。');
+          correctAnswers++;
+          document.getElementById('question-2').classList.add('hidden'); // 隱藏第二題
+          showQuestion('question-3'); // 顯示第三題
+        } else if (question === 3 && answer === 'coordinates') {
+          alert('第三題答對了！mouseX 和 mouseY 是滑鼠在畫布上的座標。');
+          correctAnswers++;
+          document.getElementById('question-3').classList.add('hidden'); // 隱藏第三題
+          showResult(); // 顯示結算畫面
+        } else {
+          alert('答錯了！請再試一次。');
+        }
+      }
+
+      // 顯示結算畫面
+      function showResult() {
+        const resultScreen = document.getElementById('result-screen');
+        const resultMessage = document.getElementById('result-message');
+        resultMessage.textContent = `您答對了 ${correctAnswers} 題！`;
+        resultScreen.classList.remove('hidden'); // 顯示結算畫面
+      }
+
+      // 重新開始測驗
+      function restartQuiz() {
+        correctAnswers = 0; // 重置答對的題數
+        document.getElementById('result-screen').classList.add('hidden'); // 隱藏結算畫面
+        document.getElementById('question-1').classList.remove('hidden'); // 顯示第一題
+      }
+    </script>
+
+    <style>
+      .hidden {
+        display: none;
+      }
+    </style>
+  </body>
+</html>
